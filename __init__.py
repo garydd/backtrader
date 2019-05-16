@@ -88,3 +88,6 @@ from . import talib as talib
 # Load contributed indicators and studies
 import backtrader.indicators.contrib
 import backtrader.studies.contrib
+
+
+from . import helpers as helpers
