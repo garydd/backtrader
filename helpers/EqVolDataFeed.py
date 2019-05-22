@@ -38,14 +38,15 @@ class EqVolFutDataFeed(PandasData):
         ('close', 'PX_Last'),
         ('volume', 'PX_Volume'),
         ('openinterest', None),
-        ('roll', 'Roll')
+        ('roll', 'Roll'),
+        ('days', 'Days'),
     )
 
     datafields = [
-        'datetime', 'open', 'high', 'low', 'close', 'volume', 'openinterest', 'roll'
+        'datetime', 'open', 'high', 'low', 'close', 'volume', 'openinterest', 'roll', 'days',
     ]
 
-    lines = ('roll',)
+    lines = ('roll', 'days')
 
     def __init__(self, ticker, begin=None, end=None):
         assert ticker[:2].upper() == 'UX', "Currently only support VIX futures ticker"
@@ -66,12 +67,15 @@ class EqVolFutDataFeed(PandasData):
         df = db.get_data('bbg_vol_future_prices', where_clause=where_clause)
         df['Roll'] = 0
         df.loc[df.index[-1], 'Roll'] = 1
+        df['Days'] = list(range(df.shape[0])[::-1])
+        # df.to_csv("c:/temp/df_bt_debug.csv")
         # df.loc[df.index[0], 'Roll'] = 1
         self.p.dataname = df.set_index('Date')
         self.p.name = ticker
         self._data = df.set_index('Date')
         super(EqVolFutDataFeed, self).__init__()
         colnames = list(self.p.dataname.columns.values)
+
         if self.p.datetime is None:
             # datetime is expected as index col and hence not returned
             pass
@@ -85,8 +89,8 @@ class EqVolFutDataFeed(PandasData):
 
         # Build the column mappings to internal fields in advance
         for datafield in set(self.getlinealiases() + tuple(self.datafields)):
-            defmapping = getattr(self.params, datafield)
 
+            defmapping = getattr(self.params, datafield)
 
             if isinstance(defmapping, integer_types) and defmapping < 0:
                 # autodetection requested

@@ -106,7 +106,7 @@ class RollOver(bt.with_metaclass(MetaRollOver, bt.DataBase)):
         ('checkcondition', None),  # callable
     )
 
-    lines = ('roll',)
+    lines = ('roll', 'days')
 
     def islive(self):
         '''Returns ``True`` to notify ``Cerebro`` that preloading and runonce
@@ -199,6 +199,7 @@ class RollOver(bt.with_metaclass(MetaRollOver, bt.DataBase)):
             self.lines.openinterest[0] = self._d.lines.openinterest[0]
             try:
                 self.lines.roll[0] = self._d.lines.roll[0]
+                self.lines.days[0] = self._d.lines.days[0]
             except AttributeError as e:
                 raise AttributeError(e)
             return True
